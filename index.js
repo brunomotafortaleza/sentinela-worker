@@ -1,3 +1,3 @@
 module.exports = function(a){
-	return a;
+	return a * 2;
 }
