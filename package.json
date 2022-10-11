@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/brunomotafortaleza/sentinela-worker/issues"
   },
-  "homepage": "https://github.com/brunomotafortaleza/sentinela-worker#readme"
+  "homepage": "https://github.com/brunomotafortaleza/sentinela-worker#readme",
+  "dependencies": {
+    "amqplib": "^0.10.3"
+  }
 }
