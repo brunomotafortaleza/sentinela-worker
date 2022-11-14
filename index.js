@@ -11,20 +11,13 @@ async function processMessage(msg, channel, callback) {
     let payload = JSON.parse( msg.content.toString() );  
     
 	let payload_retorno = (callback) ? await callback( payload ) : null;
-
-    console.log('payload_retorno', payload_retorno );
-    console.log('process.env.AMQP_WEBHOOK_QUEUE', process.env.AMQP_WEBHOOK_QUEUE );
-    console.log('process.env.AMQP_QUEUE_PUBLISHER', process.env.AMQP_QUEUE_PUBLISHER );
-
     
     if ( process.env.AMQP_WEBHOOK_QUEUE && payload_retorno ){
          let pubret = await publisher(process.env.AMQP_WEBHOOK_QUEUE, payload_retorno );
-         console.log('pubret', pubret );
     }
 
     if ( process.env.AMQP_QUEUE_PUBLISHER && payload_retorno ){
         let pubret = await publisher(process.env.AMQP_QUEUE_PUBLISHER, payload_retorno );         
-         console.log('pubret', pubret );
     }
 
     await channel.ack(msg);    
@@ -38,7 +31,7 @@ async function processMessage(msg, channel, callback) {
 
 module.exports.publisher = publisher;
 
-module.exports.worker = (async (callback) => {
+module.exports.worker = async (QUEUE = AMQP_QUEUE,callback) => {
 
     const connection = await amqplib.connect(AMQP_URL, "heartbeat=60");
     const channel = await connection.createChannel();
@@ -51,11 +44,11 @@ module.exports.worker = (async (callback) => {
       process.exit(0);
     });
 
-    await channel.assertQueue(AMQP_QUEUE, {durable: true});
+    await channel.assertQueue(QUEUE, {durable: true});
     
-    await channel.consume(AMQP_QUEUE, 
+    await channel.consume(QUEUE, 
       async (payload) => {	
-        await processMessage(payload, channel, callback);        
+        return await processMessage(payload, channel, callback);        
       },{
       noAck: false/*,
       consumerTag: 'email_consumer'*/
@@ -64,4 +57,4 @@ module.exports.worker = (async (callback) => {
     console.log(" [*] Waiting for jobs... ");
 
 
-})();
+};
