@@ -29,7 +29,7 @@ module.exports = async (AMQP_QUEUE, msgs = null) => {
     msgs = ( Array.isArray( msgs ) ) ? msgs : [msgs];    
 
     for (let msg of msgs) {
-      let ret = await channel.publish(exchange, routingKey, Buffer.from(JSON.stringify(msg)));  
+      let ret = await channel.publish(exchange, routingKey, Buffer.from(JSON.stringify(msg)), {persistent: true});  
       rets.push(ret);
     };
 
